@@ -1,5 +1,6 @@
 // write your code here
 let ramenList;
+let idxRamen;
 
 document.addEventListener('DOMContentLoaded', () => {
     fetch('http://localhost:3000/ramens')
@@ -9,7 +10,10 @@ document.addEventListener('DOMContentLoaded', () => {
         
         ramenList = ramens;
         displayRamenMenu();
-   
+        if (ramenList.length > 0) {
+            idxRamen = 0;
+            displayRamenDetail();
+        }
     })
     .catch(error => console.log(error));
 });
@@ -31,17 +35,23 @@ function displayRamenMenu() {
 
 function onClickImg(e) {
     //console.log(e);
-    const idx = parseInt(e.target.nextSibling.textContent, 10);
+    idxRamen = parseInt(e.target.nextSibling.textContent, 10);
+    displayRamenDetail();
+}
+
+function displayRamenDetail() {
     const divRamenDetail = document.getElementById('ramen-detail');
-    divRamenDetail.children[0].src = ramenList[idx].image;
-    divRamenDetail.children[0].alt = ramenList[idx].name;
-    divRamenDetail.children[1].textContent = ramenList[idx].name;
-    divRamenDetail.children[2].textContent = ramenList[idx].restaurant;
+    divRamenDetail.children[0].src = ramenList[idxRamen].image;
+    divRamenDetail.children[0].alt = ramenList[idxRamen].name;
+    divRamenDetail.children[1].textContent = ramenList[idxRamen].name;
+    divRamenDetail.children[2].textContent = ramenList[idxRamen].restaurant;
 
     const spanRating = document.getElementById('rating-display');
-    spanRating.textContent = ramenList[idx].rating;
+    spanRating.textContent = ramenList[idxRamen].rating;
     const pComment = document.getElementById('comment-display');
-    pComment.textContent = ramenList[idx].comment;
+    pComment.textContent = ramenList[idxRamen].comment;
+
+
 }
 
 const frmNewRamen = document.getElementById('new-ramen');
@@ -65,4 +75,24 @@ frmNewRamen.addEventListener('submit', e => {
     displayRamenMenu();
 
     e.target.reset();
+});
+
+document.getElementById('edit-ramen').addEventListener('submit', e => {
+    e.preventDefault();
+
+    ramenList[idxRamen].rating = parseInt(document.getElementById('edit-rating').value, 10);
+    ramenList[idxRamen].comment = document.getElementById('edit-comment').value;
+    displayRamenDetail();
+
+    e.target.reset();
+});
+
+document.getElementById('delete-ramen').addEventListener('click', e => {
+    console.log(e);
+    ramenList.splice(idxRamen, 1);
+    displayRamenMenu();
+    if (ramenList.length > 0) {
+        idxRamen = 0;
+        displayRamenDetail();
+    }
 });
