@@ -7,13 +7,13 @@ document.addEventListener('DOMContentLoaded', () => {
     .then(resp => resp.json())
     .then(ramens => {
         //console.log(ramens);
-        
+
         ramenList = ramens;
         displayRamenMenu();
         if (ramenList.length > 0) {
             idxRamen = 0;
             displayRamenDetail();
-        }
+        }        
     })
     .catch(error => console.log(error));
 });
@@ -74,15 +74,31 @@ frmNewRamen.addEventListener('submit', e => {
     const ramenImg = document.getElementById('new-image').value;
     const ramenRating = parseInt(document.getElementById('new-rating').value, 10);
     const ramenComment = document.getElementById('new-comment').value;
-    ramenList.push({
-        id: ramenList[ramenList.length-1].id + 1,
-        name: ramenName,
-        restaurant: ramenRestaurant,
-        image: ramenImg,
-        rating: ramenRating,
-        comment: ramenComment,
-    });
-    displayRamenMenu();
+
+    fetch(`http://localhost:3000/ramens`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+        },
+        body: JSON.stringify({
+            name: ramenName,
+            restaurant: ramenRestaurant,
+            image: ramenImg,
+            rating: ramenRating,
+            comment: ramenComment,
+        }),
+    })
+    .then(resp => resp.json())
+    .then(ramen => {
+        //console.log(ramen);
+
+        ramenList.push(ramen);
+        displayRamenMenu();
+        idxRamen = ramenList.length - 1;
+        displayRamenDetail();
+    })
+    .catch(error => console.log(error));
 
     e.target.reset();
 });
@@ -90,17 +106,47 @@ frmNewRamen.addEventListener('submit', e => {
 document.getElementById('edit-ramen').addEventListener('submit', e => {
     e.preventDefault();
 
-    ramenList[idxRamen].rating = parseInt(document.getElementById('edit-rating').value, 10);
-    ramenList[idxRamen].comment = document.getElementById('edit-comment').value;
-    displayRamenDetail();
+    fetch(`http://localhost:3000/ramens/${ramenList[idxRamen].id}`, {
+        method: 'PATCH',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+        },
+        body: JSON.stringify({
+            rating: parseInt(document.getElementById('edit-rating').value, 10),
+            comment: document.getElementById('edit-comment').value,
+        }),
+    })
+    .then(resp => resp.json())
+    .then(ramen => {
+        //console.log(ramen);
+
+        ramenList[idxRamen] = ramen;
+        displayRamenDetail();
+    })
+    .catch(error => console.log(error));
 
     e.target.reset();
 });
 
 document.getElementById('delete-ramen').addEventListener('click', e => {
-    console.log(e);
-    ramenList.splice(idxRamen, 1);
-    displayRamenMenu();
-    idxRamen = (ramenList.length > 0) ? 0 : -1;
-    displayRamenDetail();
+    //console.log(e);
+
+    fetch(`http://localhost:3000/ramens/${ramenList[idxRamen].id}`, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+        },
+    })
+    .then(resp => resp.json())
+    .then(ramen => {
+        //console.log(ramen);
+
+        ramenList.splice(idxRamen, 1);
+        displayRamenMenu();
+        idxRamen = (ramenList.length > 0) ? 0 : -1;
+        displayRamenDetail();
+    })
+    .catch(error => console.log(error));
 });
