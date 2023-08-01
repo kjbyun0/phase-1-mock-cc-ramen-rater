@@ -1,6 +1,6 @@
 // write your code here
 let ramenList;
-let idxRamen;
+let idxRamen = -1;
 
 document.addEventListener('DOMContentLoaded', () => {
     fetch('http://localhost:3000/ramens')
@@ -41,17 +41,27 @@ function onClickImg(e) {
 
 function displayRamenDetail() {
     const divRamenDetail = document.getElementById('ramen-detail');
-    divRamenDetail.children[0].src = ramenList[idxRamen].image;
-    divRamenDetail.children[0].alt = ramenList[idxRamen].name;
-    divRamenDetail.children[1].textContent = ramenList[idxRamen].name;
-    divRamenDetail.children[2].textContent = ramenList[idxRamen].restaurant;
-
-    const spanRating = document.getElementById('rating-display');
-    spanRating.textContent = ramenList[idxRamen].rating;
-    const pComment = document.getElementById('comment-display');
-    pComment.textContent = ramenList[idxRamen].comment;
-
-
+    if (ramenList.length === 0) {
+        divRamenDetail.children[0].src = "./assets/image-placeholder.jpg";
+        divRamenDetail.children[0].alt = "Insert Name Here";
+        divRamenDetail.children[1].textContent = "-";
+        divRamenDetail.children[2].textContent = "-";
+    
+        const spanRating = document.getElementById('rating-display');
+        spanRating.textContent = "-";
+        const pComment = document.getElementById('comment-display');
+        pComment.textContent = "-";
+    } else {
+        divRamenDetail.children[0].src = ramenList[idxRamen].image;
+        divRamenDetail.children[0].alt = ramenList[idxRamen].name;
+        divRamenDetail.children[1].textContent = ramenList[idxRamen].name;
+        divRamenDetail.children[2].textContent = ramenList[idxRamen].restaurant;
+    
+        const spanRating = document.getElementById('rating-display');
+        spanRating.textContent = ramenList[idxRamen].rating;
+        const pComment = document.getElementById('comment-display');
+        pComment.textContent = ramenList[idxRamen].comment;
+    }
 }
 
 const frmNewRamen = document.getElementById('new-ramen');
@@ -91,8 +101,6 @@ document.getElementById('delete-ramen').addEventListener('click', e => {
     console.log(e);
     ramenList.splice(idxRamen, 1);
     displayRamenMenu();
-    if (ramenList.length > 0) {
-        idxRamen = 0;
-        displayRamenDetail();
-    }
+    idxRamen = (ramenList.length > 0) ? 0 : -1;
+    displayRamenDetail();
 });
